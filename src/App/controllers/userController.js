@@ -75,7 +75,7 @@ class userController {
         role: user.role,
       };
 
-      const token = jwt.sign(payload, "Nextwaves@2023", { expiresIn: "5m" });
+      const token = jwt.sign(payload, "Nextwaves@2023", { expiresIn: "1h" });
 
       // Trả về token
       return res.status(200).json({ token });
