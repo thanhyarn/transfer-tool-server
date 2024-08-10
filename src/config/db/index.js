@@ -7,7 +7,7 @@ async function connect() {
   };
   try {
     mongoose.connect(
-      "mongodb+srv://thanhyarn:123@atlascluster.bfqeyvn.mongodb.net/TransferTool"
+      "mongodb+srv://binhtayfood:binhtayfoodtool@binhtayfood.imdlw.mongodb.net/TransferTool"
     );
     console.log("database connected");
   } catch (error) {

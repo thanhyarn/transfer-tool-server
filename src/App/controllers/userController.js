@@ -1,6 +1,8 @@
 const userModal = require("../models/User");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const ActionLog = require("../models/ActionLog");
+
 const mongoose = require("mongoose");
 
 class userController {
@@ -53,7 +55,9 @@ class userController {
 
     try {
       // Kiểm tra xem người dùng có tồn tại không
-      const user = await userModal.findOne({ email });
+      const user = await userModal.findOne({
+        $or: [{ email: email }, { username: email }],
+      });
       if (!user) {
         return res
           .status(400)
@@ -72,10 +76,20 @@ class userController {
       const payload = {
         userId: user._id,
         username: user.username,
+        fulName: user.fullName,
         role: user.role,
       };
 
       const token = jwt.sign(payload, "Nextwaves@2023", { expiresIn: "1h" });
+
+      // Lưu lịch sử đăng nhập vào bảng ActionLog với thời gian đã điều chỉnh
+      const actionLog = new ActionLog({
+        userId: user._id,
+        action: `Đăng nhập vào hệ thống`,
+        timestamp: Date.now(), // Thời gian đã được điều chỉnh +7 giờ
+      });
+
+      await actionLog.save();
 
       // Trả về token
       return res.status(200).json({ token });
