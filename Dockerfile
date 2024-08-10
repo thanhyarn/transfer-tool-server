@@ -1,24 +1,32 @@
-# Sử dụng Node.js image chính thức từ Docker Hub
-FROM node:18
+# Stage 1: Build the application
+FROM node:18-alpine AS builder
 
-# Đặt biến môi trường
-ENV NODE_ENV=production
-
-# Thiết lập thư mục làm việc trong container
+# Set working directory
 WORKDIR /app
 
-# Sao chép tệp package.json và package-lock.json (nếu có) vào container
+# Copy package.json and package-lock.json
 COPY package*.json ./
 
-# Cài đặt các dependencies
+# Install dependencies
 RUN npm install --production
 
-# Sao chép toàn bộ mã nguồn của bạn vào container
+# Copy the rest of the application code
 COPY . .
 
-# Mở port mà ứng dụng của bạn sẽ chạy
+# Build the application (nếu bạn có bước build, như với ứng dụng React hoặc TypeScript)
+# RUN npm run build
+
+# Stage 2: Create the production image
+FROM node:18-alpine
+
+# Set working directory
+WORKDIR /app
+
+# Copy only the necessary files from the builder stage
+COPY --from=builder /app .
+
+# Expose the port the app runs on
 EXPOSE 3000
 
-# Khởi động ứng dụng
+# Run the application
 CMD ["node", "server.js"]
-# docker build -t thanhgiang1306/transfer-tool:dev ./ && docker push thanhgiang1306/transfer-tool:dev 
